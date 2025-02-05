@@ -1,0 +1,29 @@
+{
+  "name": "wheres_waldo_backend_top",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/Isutomu/wheres_waldo_backend_TOP#readme",
+  "bugs": {
+    "url": "https://github.com/Isutomu/wheres_waldo_backend_TOP/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Isutomu/wheres_waldo_backend_TOP.git"
+  },
+  "license": "ISC",
+  "author": "Isutomu Naruto",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.9"
+  }
+}
