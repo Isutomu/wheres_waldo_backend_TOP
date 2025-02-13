@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Photo {
+  id                  String               @id @default(uuid())
+  url                 String               @unique
+  charactersInPicture CharacterInPicture[]
+  sessions            Session[]
+  scores              Score[]
+}
+
+model Character {
+  id                  String               @id @default(uuid())
+  name                String               @unique @db.VarChar(25)
+  url                 String
+  charactersInPicture CharacterInPicture[]
+}
+
+model CharacterInPicture {
+  id          String    @id @default(uuid())
+  positionX   String
+  positionY   String
+  photo       Photo     @relation(fields: [photoId], references: [id])
+  photoId     String
+  character   Character @relation(fields: [characterId], references: [id])
+  characterId String
+  sessions    Session[]
+}
+
+model Session {
+  id              String               @id @default(uuid())
+  startTime       DateTime             @default(now())
+  endTime         DateTime             @default(now())
+  charactersFound CharacterInPicture[]
+  photo           Photo                @relation(fields: [photoId], references: [id])
+  photoId         String
+}
+
+model Score {
+  id       String   @id @default(uuid())
+  username String
+  time     DateTime
+  photo    Photo    @relation(fields: [photoId], references: [id])
+  photoId  String
+}
