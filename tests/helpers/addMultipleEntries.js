@@ -15,7 +15,7 @@ const addEntries = async (data, type) => {
       prismaFunction = prisma.characterInPicture.create;
       break;
     case "sessions":
-      prismaFunction = prisma.sessions.create;
+      prismaFunction = prisma.session.create;
       break;
     case "scores":
       prismaFunction = prisma.score.create;
