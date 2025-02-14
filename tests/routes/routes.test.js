@@ -8,6 +8,8 @@ const cookieParser = require("cookie-parser");
 const routes = require("../../src/routes");
 const prismaClientSelector = require("../../src/config/prismaClientSelector");
 const cleanDatabase = require("../helpers/cleanDatabase");
+const addEntries = require("../helpers/addMultipleEntries");
+const testData = require("../mockData/mockDataForDb");
 
 // Server Initialization
 const app = express();
@@ -22,13 +24,11 @@ const prisma = prismaClientSelector();
 
 // Populate db with necessary entries for tests
 beforeEach(async () => {
-  cleanDatabase();
+  await cleanDatabase();
 
-  await prisma.photo.create({ data: testData.photo });
-  for (const character of testData.characters)
-    await prisma.character.create({ data: character });
-  for (const characterInPicture of testData.charactersInPicture)
-    await prisma.characterInPicture.create({ data: characterInPicture });
+  await addEntries(testData.photos, "photos");
+  await addEntries(testData.characters, "characters");
+  await addEntries(testData.charactersInPicture, "charactersInPicture");
 });
 
 // Clean db
@@ -56,6 +56,67 @@ test("Get photo route works", (done) => {
     .get("/photos")
     .expect("Content-Type", /json/)
     .expect({ data })
-    .expect("set-cookie", "sessionId=id")
+    .expect("set-cookie", "sessionId=id1")
+    .expect(200, done);
+});
+
+test("Post position guess(correct) route works", (done) => {
+  const data = {
+    check: true,
+  };
+  const reqData = {
+    characterId: "id1",
+    positionX: "1",
+    positionY: "1",
+  };
+
+  request(app)
+    .post("/guesses")
+    .type("json")
+    .set("Cookie", "sessionId=id1")
+    .send(reqData)
+    .expect("Content-Type", /json/)
+    .expect({ data })
+    .expect(200, done);
+});
+
+test("Post position guess(incorrect) route works", (done) => {
+  const data = {
+    check: false,
+  };
+  const reqData = {
+    characterId: "id1",
+    positionX: "100",
+    positionY: "10000",
+  };
+
+  request(app)
+    .post("/guesses")
+    .type("json")
+    .set("Cookie", "sessionId=id1")
+    .send(reqData)
+    .expect("Content-Type", /json/)
+    .expect({ data })
+    .expect(200, done);
+});
+
+test("Post position guess(correct and end) route works", (done) => {
+  const data = {
+    check: false,
+    end: true,
+  };
+  const reqData = {
+    characterId: "id3",
+    positionX: "3",
+    positionY: "3",
+  };
+
+  request(app)
+    .post("/guesses")
+    .type("json")
+    .set("Cookie", "sessionId=id2")
+    .send(reqData)
+    .expect("Content-Type", /json/)
+    .expect({ data })
     .expect(200, done);
 });
