@@ -49,10 +49,14 @@ module.exports.sessions = [
   {
     id: "id1",
     photoId: "id1",
+    startTime: "2025-02-14T19:00:00Z",
+    endTime: "2025-02-14T19:02:30Z",
   },
   {
     id: "id2",
     photoId: "id2",
+    startTime: "2025-02-14T21:00:00Z",
+    endTime: "2025-02-14T21:02:30Z",
   },
 ];
 
@@ -60,9 +64,11 @@ module.exports.scores = [
   {
     username: "isutomu",
     photoId: "id1",
+    time: "00:02:30",
   },
   {
     username: "naruto",
     photoId: "id2",
+    time: "02:02:30",
   },
 ];
