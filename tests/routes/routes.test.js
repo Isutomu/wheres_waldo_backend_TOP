@@ -20,8 +20,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use("/", routes);
 
-const prisma = prismaClientSelector();
-
 // Populate db with necessary entries for tests
 beforeEach(async () => {
   await cleanDatabase();
@@ -35,6 +33,7 @@ beforeEach(async () => {
 afterEach(cleanDatabase);
 
 // Tests
+// Test get photo route
 test("Get photo route works", (done) => {
   const data = {
     url: "url",
@@ -60,6 +59,9 @@ test("Get photo route works", (done) => {
     .expect(200, done);
 });
 
+/**
+ * Test position guess route
+ */
 test("Post position guess(correct) route works", (done) => {
   const data = {
     check: true,
@@ -79,7 +81,6 @@ test("Post position guess(correct) route works", (done) => {
     .expect({ data })
     .expect(200, done);
 });
-
 test("Post position guess(incorrect) route works", (done) => {
   const data = {
     check: false,
@@ -99,7 +100,6 @@ test("Post position guess(incorrect) route works", (done) => {
     .expect({ data })
     .expect(200, done);
 });
-
 test("Post position guess(correct and end) route works", (done) => {
   const data = {
     check: false,
@@ -119,4 +119,33 @@ test("Post position guess(correct and end) route works", (done) => {
     .expect("Content-Type", /json/)
     .expect({ data })
     .expect(200, done);
+});
+
+// Test adding new score route
+describe("Test adding scores", () => {
+  // Add sessions to database
+  beforeEach(async () => {
+    await addEntries(testData.sessions, "sessions");
+  });
+
+  // Clean db
+  afterEach(cleanDatabase);
+
+  test("Post new score route works", (done) => {
+    const data = { username: "isutomu", photoId: "id1", time: "00:02:30" };
+    const reqData = {
+      username: "isutomu",
+    };
+
+    request(app)
+      .post("/scores")
+      .type("json")
+      .set("Cookie", "sessionId=id1")
+      .send(reqData)
+      .expect("Content-Type", /json/)
+      .expect((res) =>
+        expect(res.body.data).toEqual(expect.objectContaining(data))
+      )
+      .expect(201, done);
+  });
 });
