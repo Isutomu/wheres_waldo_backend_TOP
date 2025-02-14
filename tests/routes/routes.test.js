@@ -18,46 +18,44 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use("/", routes);
 
+const prisma = prismaClientSelector();
+
+// Populate db with necessary entries for tests
+beforeEach(async () => {
+  cleanDatabase();
+
+  await prisma.photo.create({ data: testData.photo });
+  for (const character of testData.characters)
+    await prisma.character.create({ data: character });
+  for (const characterInPicture of testData.charactersInPicture)
+    await prisma.characterInPicture.create({ data: characterInPicture });
+});
+
+// Clean db
+afterEach(cleanDatabase);
+
 // Tests
-describe("Get tests", () => {
-  const testData = require("../mockData/mockData");
-  const prisma = prismaClientSelector();
+test("Get photo route works", (done) => {
+  const data = {
+    url: "url",
+    charactersInPicture: {
+      characters: [
+        {
+          name: "Odlaw",
+          url: "url",
+        },
+        {
+          name: "Woof",
+          url: "url",
+        },
+      ],
+    },
+  };
 
-  // Populate db with necessary entries for tests
-  beforeAll(async () => {
-    cleanDatabase();
-    await prisma.photo.create({ data: testData.photo });
-    for (const character of testData.characters)
-      await prisma.character.create({ data: character });
-    for (const characterInPicture of testData.charactersInPicture)
-      await prisma.characterInPicture.create({ data: characterInPicture });
-  });
-
-  // Clean db
-  afterAll(cleanDatabase);
-
-  test("Get photo route works", (done) => {
-    const data = {
-      url: "url",
-      charactersInPicture: {
-        characters: [
-          {
-            name: "Odlaw",
-            url: "url",
-          },
-          {
-            name: "Woof",
-            url: "url",
-          },
-        ],
-      },
-    };
-
-    request(app)
-      .get("/photos")
-      .expect("Content-Type", /json/)
-      .expect({ data })
-      .expect("set-cookie", "sessionId=id")
-      .expect(200, done);
-  });
+  request(app)
+    .get("/photos")
+    .expect("Content-Type", /json/)
+    .expect({ data })
+    .expect("set-cookie", "sessionId=id")
+    .expect(200, done);
 });
