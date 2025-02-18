@@ -40,7 +40,10 @@ model CharacterInPicture {
 }
 
 model Session {
-  id              String               @id @default(uuid())
+  id              String               @id
+  sid             String               @unique
+  data            String
+  expiresAt       DateTime
   startTime       DateTime             @default(now())
   endTime         DateTime             @default(now())
   charactersFound CharacterInPicture[]
