@@ -7,7 +7,7 @@ const { PrismaClient } = require("@prisma/client");
  *
  * @returns {Object} A PrismaClient instance.
  */
-const PrismaClientSelector = () => {
+const prismaClientSelector = () => {
   let url;
 
   switch (process.env.NODE_ENV) {
@@ -33,4 +33,4 @@ const PrismaClientSelector = () => {
   });
 };
 
-module.exports = PrismaClientSelector;
+module.exports = prismaClientSelector;
