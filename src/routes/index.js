@@ -9,7 +9,7 @@ const postMethods = require("../controllers/post");
 const router = Router();
 
 // Requests
-router.get("/", getMethods.method1);
+router.get("/photos", getMethods.photos);
 router.post("/", postMethods.method1);
 
 module.exports = router;
