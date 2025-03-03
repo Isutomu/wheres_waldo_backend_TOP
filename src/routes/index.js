@@ -10,6 +10,6 @@ const router = Router();
 
 // Requests
 router.get("/photos", getMethods.photos);
-router.post("/", postMethods.method1);
+router.post("/scores", postMethods.scores);
 
 module.exports = router;
