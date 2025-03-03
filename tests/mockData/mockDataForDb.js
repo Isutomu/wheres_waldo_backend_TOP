@@ -70,11 +70,11 @@ module.exports.scores = [
   {
     username: "isutomu",
     photoId: "id1",
-    time: "00:02:30",
+    time: "1970-01-01T00:02:30.000Z",
   },
   {
     username: "naruto",
     photoId: "id2",
-    time: "02:02:30",
+    time: "1970-01-01T02:02:30.000Z",
   },
 ];
