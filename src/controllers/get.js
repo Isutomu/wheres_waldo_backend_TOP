@@ -20,12 +20,9 @@ const photos = asyncHandler(async (req, res) => {
     },
   });
 
-  console.log({ url: data.selectedPhoto.url, characters: data.characters });
-  return res
-    .status(200)
-    .json({
-      data: { url: data.selectedPhoto.url, characters: data.characters },
-    });
+  return res.status(200).json({
+    data: { url: data.selectedPhoto.url, characters: data.characters },
+  });
 });
 
 // Exports of all methods as object
