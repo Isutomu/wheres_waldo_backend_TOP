@@ -140,31 +140,36 @@ test("Get photo route works", (done) => {
 //     .expect(200, done);
 // });
 
-// // Test adding new score route
-// describe("Test adding scores", () => {
-//   // Add sessions to database
-//   beforeEach(async () => {
-//     await addEntries(testData.sessions, "sessions");
-//   });
+// Test adding new score route
+test("Post new score route works", (done) => {
+  const data = {
+    username: testData.scores[0].username,
+    photoId: testData.scores[0].photoId,
+    time: testData.scores[0].time,
+  };
+  const reqData = {
+    username: "isutomu",
+  };
+  const sessionId = testData.sessions[0].id;
+  const injectUser = async (req, res, next) => {
+    req.session = { id: sessionId };
+    req.body = reqData;
+    res.cookie("sid", sessionId, { httpOnly: true });
+    next();
+  };
+  const routesWithSession = express().use(injectUser).use(routes);
 
-//   // Clean db
-//   afterEach(cleanDatabase);
-
-//   test("Post new score route works", (done) => {
-//     const data = { username: "isutomu", photoId: "id1", time: "00:02:30" };
-//     const reqData = {
-//       username: "isutomu",
-//     };
-
-//     request(app)
-//       .post("/scores")
-//       .type("json")
-//       .set("Cookie", "sessionId=id1")
-//       .send(reqData)
-//       .expect("Content-Type", /json/)
-//       .expect((res) =>
-//         expect(res.body.data).toEqual(expect.objectContaining(data)),
-//       )
-//       .expect(201, done);
-//   });
-// });
+  request(routesWithSession)
+    .post("/scores")
+    .expect("Content-Type", /json/)
+    .expect((res) =>
+      expect(res.body.data).toEqual(expect.objectContaining(data)),
+    )
+    .expect(201)
+    .end((err, res) => {
+      if (err) {
+        console.error(res.error);
+      }
+      done(err);
+    });
+});
