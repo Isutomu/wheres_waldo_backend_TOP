@@ -78,68 +78,6 @@ test("Get photo route works", (done) => {
     });
 });
 
-// /**
-//  * Test position guess route
-//  */
-// test("Post position guess(correct) route works", (done) => {
-//   const data = {
-//     check: true,
-//   };
-//   const reqData = {
-//     characterId: "id1",
-//     positionX: "1",
-//     positionY: "1",
-//   };
-
-//   request(app)
-//     .post("/guesses")
-//     .type("json")
-//     .set("Cookie", "sessionId=id1")
-//     .send(reqData)
-//     .expect("Content-Type", /json/)
-//     .expect({ data })
-//     .expect(200, done);
-// });
-// test("Post position guess(incorrect) route works", (done) => {
-//   const data = {
-//     check: false,
-//   };
-//   const reqData = {
-//     characterId: "id1",
-//     positionX: "100",
-//     positionY: "10000",
-//   };
-
-//   request(app)
-//     .post("/guesses")
-//     .type("json")
-//     .set("Cookie", "sessionId=id1")
-//     .send(reqData)
-//     .expect("Content-Type", /json/)
-//     .expect({ data })
-//     .expect(200, done);
-// });
-// test("Post position guess(correct and end) route works", (done) => {
-//   const data = {
-//     check: false,
-//     end: true,
-//   };
-//   const reqData = {
-//     characterId: "id3",
-//     positionX: "3",
-//     positionY: "3",
-//   };
-
-//   request(app)
-//     .post("/guesses")
-//     .type("json")
-//     .set("Cookie", "sessionId=id2")
-//     .send(reqData)
-//     .expect("Content-Type", /json/)
-//     .expect({ data })
-//     .expect(200, done);
-// });
-
 // Test adding new score route
 test("Post new score route works", (done) => {
   const data = {
@@ -172,4 +110,106 @@ test("Post new score route works", (done) => {
       }
       done(err);
     });
+});
+
+/**
+ * Test position guess route
+ */
+test("Post position guess(correct) route works", (done) => {
+  const data = {
+    check: true,
+  };
+  const reqData = {
+    characterId: testData.charactersInPicture[0].characterId,
+    positionX: testData.charactersInPicture[0].positionX,
+    positionY: testData.charactersInPicture[0].positionY,
+  };
+
+  const sessionId = testData.sessions[0].id;
+  const injectUser = async (req, res, next) => {
+    req.session = { id: sessionId };
+    req.body = reqData;
+    res.cookie("sid", sessionId, { httpOnly: true });
+    next();
+  };
+  const routesWithSession = express().use(injectUser).use(routes);
+
+  request(routesWithSession)
+    .post("/guesses")
+    .expect("Content-Type", /json/)
+    .expect({ data })
+    .expect(200)
+    .end((err, res) => {
+      if (err) {
+        console.error(res.error);
+      }
+      done(err);
+    });
+});
+test("Post position guess(incorrect) route works", (done) => {
+  const data = {
+    check: false,
+  };
+  const reqData = {
+    characterId: testData.charactersInPicture[0].characterId,
+    positionX: testData.charactersInPicture[0].positionX + "error",
+    positionY: testData.charactersInPicture[0].positionY + "error",
+  };
+
+  const sessionId = testData.sessions[0].id;
+  const injectUser = async (req, res, next) => {
+    req.session = { id: sessionId };
+    req.body = reqData;
+    res.cookie("sid", sessionId, { httpOnly: true });
+    next();
+  };
+  const routesWithSession = express().use(injectUser).use(routes);
+
+  request(routesWithSession)
+    .post("/guesses")
+    .expect("Content-Type", /json/)
+    .expect({ data })
+    .expect(200, done);
+});
+describe("full mock data tests", () => {
+  // Populate db with necessary entries for tests
+  beforeEach(async () => {
+    await cleanDatabase();
+
+    await addEntries(testData.photos, "photos");
+    await addEntries(testData.characters, "characters");
+    await addEntries(testData.charactersInPicture, "charactersInPicture");
+    await addEntries(testData.sessions, "sessions");
+  });
+
+  // Clean db
+  afterEach(cleanDatabase);
+
+  test("Post position guess(correct and end) route works", (done) => {
+    const data = {
+      check: true,
+      end: true,
+    };
+    const reqData = {
+      characterId: testData.charactersInPicture[2].characterId,
+      positionX: testData.charactersInPicture[2].positionX,
+      positionY: testData.charactersInPicture[2].positionY,
+    };
+
+    const sessionId = testData.sessions[1].id;
+    const injectUser = async (req, res, next) => {
+      req.session = { id: sessionId };
+      req.body = reqData;
+      res.cookie("sid", sessionId, { httpOnly: true });
+      next();
+    };
+    const routesWithSession = express().use(injectUser).use(routes);
+
+    request(routesWithSession)
+      .post("/guesses")
+      .send(reqData)
+      .expect("Content-Type", /json/)
+      .expect({ data })
+      .expect(200, done);
+  });
 });
